@@ -4,8 +4,12 @@
   "description": "examination task",
   "main": "index.js",
   "scripts": {
-    "build": "rm -rf dist && webpack --mode development",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "npm run build && node src/server/index.js",
+    "client": "webpack-dev-server --mode development --devtool inline-source-map --hot",
+    "server": "nodemon src/server/index.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "Michael Serebriakov Silberg",
   "license": "ISC",
@@ -19,8 +23,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/preset-env": "^7.22.5",
+    "@babel/preset-react": "^7.22.5",
     "babel-loader": "^9.1.2",
+    "babel-polyfill": "^6.26.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "concurrently": "^8.2.0",
     "eslint": "^8.42.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-import": "^2.27.5",
