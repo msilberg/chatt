@@ -22,6 +22,10 @@ run-server:
 run-dev-server:
 	npm run dev
 
+# Build Client
+build-client:
+	npm run build
+
 # Stop Server
 # stop-server:
 # 	pkill -f "node server.js" 
