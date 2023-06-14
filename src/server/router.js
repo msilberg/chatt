@@ -2,6 +2,7 @@ const express = require('express');
 
 const { getUserInfo, doLogin } = require('./controller');
 const { cookie: { name: chattCookieName, ttl: chattCookieTtl } } = require('./settings');
+const { getTtl } = require('./utils');
 
 const router = express.Router();
 
@@ -10,9 +11,14 @@ const apiPrefix = '/api/v1';
 router.get(`${apiPrefix}/getUserInfo`, async (req, res) => {
   const result = await getUserInfo(req.cookies);
   if (result) {
+    res.cookie(chattCookieName, JSON.stringify(result), {
+      httpOnly: true,
+      expires: getTtl(),
+    }); // renew cookie
     res.set('Content-Type', 'application/json');
     res.send(result);
   } else {
+    res.cookie(chattCookieName, '', { expires: new Date(0) }); // deleting cookie upon session expiration
     res.sendStatus(204);
   }
 });
@@ -20,11 +26,10 @@ router.get(`${apiPrefix}/getUserInfo`, async (req, res) => {
 router.post(`${apiPrefix}/login`, async (req, res) => {
   const result = await doLogin(req.body);
   if (result) {
-    const expirationTime = new Date(Date.now() + chattCookieTtl);
     res.cookie(chattCookieName, JSON.stringify(result), {
       httpOnly: true,
-      expires: expirationTime,
-    });
+      expires: getTtl(),
+    }); // create cookie
     res.sendStatus(201);
   } else {
     res.sendStatus(409);

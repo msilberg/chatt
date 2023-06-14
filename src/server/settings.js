@@ -1,7 +1,10 @@
 const settings = {
   cookie: {
     name: 'chattSession',
-    ttl: 3600000, // one hour in MS
+    ttl: 1800000, // half an hour in MS
+  },
+  channels: {
+    default: 'main'
   }
 };
 
