@@ -17,7 +17,22 @@ const Login = (props) => {
     setError('');
   };
 
-  // setError('Please enter a username.');
+  const handleLoginSubmit = () => {
+    if (username.trim() === '') {
+      setError('Please enter a username.');
+      return;
+    }
+
+    const regex = /^[a-zA-Z0-9]+$/;
+
+    if (!regex.test(username)) {
+      setError('Username must only contain letters and/or numbers.');
+      return;
+    }
+
+    onLoginSubmit(username);
+    setUsername('');
+  }
 
   return (
     <Box
@@ -52,28 +67,19 @@ const Login = (props) => {
             onChange={handleUsernameChange}
             error={Boolean(error)}
             helperText={error}
+            onKeyUp={event => {
+              event.preventDefault();
+              if (event.key === 'Enter') {
+                handleLoginSubmit();
+              }
+            }}
             fullWidth
           />
         </div>
         <div className='wrapper-new-line'>
           <Button
             variant='contained'
-            onClick={() => {
-              if (username.trim() === '') {
-                setError('Please enter a username.');
-                return;
-              }
-
-              const regex = /^[a-zA-Z0-9]+$/;
-
-              if (!regex.test(username)) {
-                setError('Username must only contain letters and/or numbers.');
-                return;
-              }
-
-              onLoginSubmit(username);
-              setUsername('');
-            }}
+            onClick={handleLoginSubmit}
           >
             Login to Chatt
           </Button>

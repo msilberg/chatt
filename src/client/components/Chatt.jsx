@@ -1,10 +1,10 @@
 import * as React from 'react';
 
 const Chatt = (props) => {
-  const { username } = props;
+  const { user } = props;
 
   return (
-    <h1>{`Hello ${username}`}</h1>
+    <h1>{`Hello ${user.username}`}</h1>
   );
 }
 
