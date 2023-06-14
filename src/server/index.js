@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser')
 
 const { connectToDatabase } = require('./db_connector');
 const router = require('./router');
@@ -6,9 +7,10 @@ const router = require('./router');
 const app = express();
 const port = process.env.APP_PORT;
 
-app.use(express.static('dist'));
-app.use(router);
-
+app
+  .use(express.static('dist'))
+  .use(cookieParser())
+  .use(router);
 
 connectToDatabase()
   .then(() => {

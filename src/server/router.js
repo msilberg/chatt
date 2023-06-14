@@ -1,10 +1,17 @@
 const express = require('express');
 
+const { getUserInfo } = require('./controller');
+
 const router = express.Router();
 
-router.get('/api/v1/getUserInfo', (req, res) => {
-  res.set('Content-Type', 'application/json');
-  res.send({ username: 'mikesilberg' });
+router.get('/api/v1/getUserInfo', async (req, res) => {
+  const result = await getUserInfo(req.cookies);
+  if (result) {
+    res.set('Content-Type', 'application/json');
+    res.send(result);
+  } else {
+    res.sendStatus(204);
+  }
 });
 
 router.get('/api/v1/info', (req, res) => {
