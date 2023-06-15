@@ -3,9 +3,31 @@ const mongoose = require('mongoose');
 const { cookie: { name: chattCookieName } } = require('./settings');
 const { getTtl } = require('./utils');
 
+let wsConnections = [];
+
 const User = require('./models/user');
 const Session = require('./models/session');
 const Message = require('./models/message')
+
+const setWS = wsConnection => {
+  if (wsConnection) {
+    wsConnections.push(wsConnection);
+  }
+}
+
+const sendMessageToAllConnectedWsClients = (eventName, data) => {
+  if (wsConnections.length && eventName && data) {
+    try {
+      for (const wsConnection of wsConnections) {
+        wsConnection.send(JSON.stringify({ eventName, data }));
+      }
+      return true;
+    } catch (error) {
+      console.error('sendWebSocketMessage cannot send message', error);
+    }
+  }
+  return false;
+}
 
 const getChattInfo = async (cookies) => {
   let chattInfo;
@@ -91,13 +113,15 @@ const uploadMessage = async (cookies, body) => {
       );
 
       if (updatedSession) {
-        const newMessage = new Message({
+        const messageDoc = {
           message,
           username: chattCookie.username,
-        });
+        };
+        const newMessage = new Message(messageDoc);
         const newMessageResult = await newMessage.save();
         if (newMessageResult) {
           result = chattCookie;
+          sendMessageToAllConnectedWsClients('newMessage', messageDoc);
         }
       } else {
         console.log('User Session not found, need to perform a new login');
@@ -114,4 +138,5 @@ module.exports = {
   getChattInfo,
   doLogin,
   uploadMessage,
+  setWS,
 }

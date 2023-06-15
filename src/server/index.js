@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 
 const { connectToDatabase } = require('./db_connector');
 const router = require('./router');
+const { setWS } = require('./controller');
 
 const app = express();
 const port = process.env.APP_PORT;
@@ -19,11 +20,9 @@ app
 
 expressWs(app);
 
-app.ws('/websocket', function (ws, req) {
-  ws.on('message', function (msg) {
-    console.log('WS Received message', msg);
-    ws.send(msg);
-  });
+app.ws('/websocket', ws => {
+  console.log('Client connected to Websocket server', new Date());
+  setWS(ws);
 });
 
 connectToDatabase()

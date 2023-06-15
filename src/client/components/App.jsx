@@ -15,6 +15,7 @@ class App extends Component {
       user: null,
       messages: [],
     };
+    this.socket = props.socket;
   }
 
   componentDidMount() {
@@ -67,7 +68,7 @@ class App extends Component {
             <Loading /> :
             (
               (user && messages) ?
-                <Chatt user={user} existingMessages={messages} /> :
+                <Chatt user={user} existingMessages={messages} socket={this.socket} /> :
                 <Login onLoginSubmit={this.onLoginSubmit} />
             )
         }

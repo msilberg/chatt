@@ -10,10 +10,19 @@ import { styled } from '@mui/material/styles';
 const apiPrefix = '/api/v1';
 
 const Chatt = (props) => {
-  const { user, existingMessages } = props;
+  const { user, existingMessages, socket } = props;
 
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState(existingMessages);
+
+  socket(
+    ({ eventName, data } = {}) => {
+      if (eventName === 'newMessage' && data?.username && data?.message && data.username !== user.username) {
+        console.log('received a new message from another user', data);
+        setMessages([...messages, { username: data.username, message: data.message }]);
+      }
+    }
+  );
 
   const Item = styled(Paper)(() => ({
     backgroundColor: '#fff',
@@ -71,9 +80,12 @@ const Chatt = (props) => {
       <Paper elevation={12} style={{ backgroundColor: '#ebebeb' }}>
         <h2>{`Welcome to the Chatt room ${user.username.toUpperCase()}!`}</h2>
         <Stack spacing={2} className='chatt-messages-frame'>
-          {messages.map(({ username, message }, index) => (
-            <Item key={index}><span className={(username === user.username) ? 'highlight-text-own' : 'highlight-text-another'}>{username}</span>: {message}</Item>
-          ))}
+          {messages.map(({ username, message }, index) => {
+            const isOwn = username === user.username;
+            return (
+              <Item key={index} style={{ textAlign: isOwn ? 'right' : 'left' }}><span className={isOwn ? 'highlight-text-own' : 'highlight-text-another'}>{username}</span>: {message}</Item>
+            );
+          })}
         </Stack>
         <Stack direction="row" spacing={0} style={{ marginTop: '30px' }}>
           <TextField
@@ -105,11 +117,13 @@ const Chatt = (props) => {
 Chatt.propTypes = {
   user: PropTypes.object,
   existingMessages: PropTypes.array, 
+  socket: PropTypes.func,
 };
 
 Chatt.defaultProps = {
   user: {},
   existingMessages: [],
+  socket: () => {},
 }
 
 export default Chatt;
