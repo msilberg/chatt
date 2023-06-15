@@ -7,10 +7,13 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 
+const apiPrefix = '/api/v1';
+
 const Chatt = (props) => {
-  const { user } = props;
+  const { user, existingMessages } = props;
 
   const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState(existingMessages);
 
   const Item = styled(Paper)(() => ({
     backgroundColor: '#fff',
@@ -26,8 +29,24 @@ const Chatt = (props) => {
   }
 
   const handleMessageUpload = () => {
-    console.log('message', message);
-    setMessage('');
+    setMessages([...messages, { username: user.username, message }]);
+    fetch(`${apiPrefix}/uploadMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ message })
+    })
+      .then(response => {
+        if (response?.status === 201) {
+          setMessage('');
+        } else {
+          throw new Error('Cannot upload new message')
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   }
 
   return (
@@ -52,7 +71,9 @@ const Chatt = (props) => {
       <Paper elevation={12} style={{ backgroundColor: '#ebebeb' }}>
         <h2>{`Welcome to the Chatt room ${user.username.toUpperCase()}!`}</h2>
         <Stack spacing={2} className='chatt-messages-frame'>
-          
+          {messages.map(({ username, message }, index) => (
+            <Item key={index}><span className={(username === user.username) ? 'highlight-text-own' : 'highlight-text-another'}>{username}</span>: {message}</Item>
+          ))}
         </Stack>
         <Stack direction="row" spacing={0} style={{ marginTop: '30px' }}>
           <TextField
@@ -82,11 +103,13 @@ const Chatt = (props) => {
 }
 
 Chatt.propTypes = {
-  user: PropTypes.object,  
+  user: PropTypes.object,
+  existingMessages: PropTypes.array, 
 };
 
 Chatt.defaultProps = {
   user: {},
+  existingMessages: [],
 }
 
 export default Chatt;

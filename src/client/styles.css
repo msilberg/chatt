@@ -10,6 +10,16 @@ h3 {
   color: rgb(125, 123, 123);
 }
 
+.highlight-text-own {
+  color: #0e4ba7;
+  font-weight: bold;
+}
+
+.highlight-text-another {
+  color: #009150;
+  font-weight: bold;
+}
+
 .wrapper {
   display: flex;
   justify-content: center;

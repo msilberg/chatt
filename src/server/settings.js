@@ -5,7 +5,7 @@ const settings = {
   },
   channels: {
     default: 'main'
-  }
+  },
 };
 
 module.exports = settings;

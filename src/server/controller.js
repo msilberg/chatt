@@ -2,34 +2,34 @@ const mongoose = require('mongoose');
 
 const { cookie: { name: chattCookieName } } = require('./settings');
 const { getTtl } = require('./utils');
+
 const User = require('./models/user');
 const Session = require('./models/session');
+const Message = require('./models/message')
 
-const getUserInfo = async (cookies) => {
-  let userInfo;
+const getChattInfo = async (cookies) => {
+  let chattInfo;
   try {
     let { [chattCookieName]: chattCookie } = cookies;
     if (chattCookie) {
       chattCookie = JSON.parse(chattCookie);
-      console.log('look here => chattCookie', chattCookie);
       const updatedSession = await Session.findByIdAndUpdate(
-        chattCookie?.sessionId, 
+        chattCookie?.sessionId,
         { expiresAt: getTtl() }, // prolonging active session per each user request
         { new: true },
       );
-  
+
       if (updatedSession) {
-        userInfo = { ...chattCookie, sessionId: updatedSession._id.toString() };
-        console.log('Updated User session:', userInfo);
+        chattInfo = { user: { ...chattCookie, sessionId: updatedSession._id.toString() }, messages: await Message.find() };
       } else {
         console.log('User Session not found, need to perform a new login');
       }
     }
   } catch (error) {
-    console.error('Chatt server Error: getUserInfo cannot parse user Cookies', error);
+    console.error('Chatt server Error: getChattInfo', error);
   }
 
-  return userInfo;
+  return chattInfo;
 }
 
 const doLogin = async ({ username } = {}) => {
@@ -67,13 +67,51 @@ const doLogin = async ({ username } = {}) => {
     const savedSession = await newSession.save();
     result = { username, sessionId: savedSession._id.toString() };
   } catch (error) {
-    console.error('Cannot perform user login', error);
+    console.error('Chatt server Error: doLogin', error);
+  }
+
+  return result;
+}
+
+const uploadMessage = async (cookies, body) => {
+  let result;
+
+  try {
+    let { [chattCookieName]: chattCookie } = cookies;
+    const { message } = body || {};
+    if (!message) {
+      throw new Error('no message was sent')
+    }
+    if (chattCookie) {
+      chattCookie = JSON.parse(chattCookie);
+      const updatedSession = await Session.findByIdAndUpdate(
+        chattCookie?.sessionId,
+        { expiresAt: getTtl() }, // prolonging active session per each user request
+        { new: true },
+      );
+
+      if (updatedSession) {
+        const newMessage = new Message({
+          message,
+          username: chattCookie.username,
+        });
+        const newMessageResult = await newMessage.save();
+        if (newMessageResult) {
+          result = chattCookie;
+        }
+      } else {
+        console.log('User Session not found, need to perform a new login');
+      }
+    }
+  } catch (error) {
+    console.error('Chatt server Error: uploadMessage', error);
   }
 
   return result;
 }
 
 module.exports = {
-  getUserInfo,
+  getChattInfo,
   doLogin,
+  uploadMessage,
 }

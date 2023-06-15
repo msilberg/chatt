@@ -8,7 +8,7 @@ const sessionSchema = new mongoose.Schema({
     ref: 'User'
   },
   channel: {
-    type: mongoose.Schema.Types.String,
+    type: String,
     default: defaultChannel,
     index: true,
     unique: false,

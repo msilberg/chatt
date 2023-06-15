@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     unique: true,
-    index: true
+    index: true,
   },
 }, { timestamps: true });
 

@@ -1,4 +1,5 @@
 const express = require('express');
+const expressWs = require('express-ws');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
@@ -15,6 +16,15 @@ app
   .use(bodyParser.json())
   .use(bodyParser.raw())
   .use(router);
+
+expressWs(app);
+
+app.ws('/websocket', function (ws, req) {
+  ws.on('message', function (msg) {
+    console.log('WS Received message', msg);
+    ws.send(msg);
+  });
+});
 
 connectToDatabase()
   .then(() => {

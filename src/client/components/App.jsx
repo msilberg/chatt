@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 
 import Login from './Login';
 import Chatt from './Chatt';
@@ -13,6 +13,7 @@ class App extends Component {
     this.state = {
       loading: true,
       user: null,
+      messages: [],
     };
   }
 
@@ -21,16 +22,16 @@ class App extends Component {
   }
 
   getUser = () => {
-    fetch(`${apiPrefix}/getUserInfo`)
+    fetch(`${apiPrefix}/getChattInfo`)
       .then(response => {
         if (response?.status === 200) {
           return response.json();
         }
       })
-      .then(user => {
+      .then(({ user, messages } = {}) => {
         this.setState({ loading: false });
         if (user) {
-          this.setState({ user });
+          this.setState({ user, messages });
         }
       });
   }
@@ -46,7 +47,7 @@ class App extends Component {
     })
       .then(response => {
         if (response?.status === 201) {
-          this.setState({ user });
+          this.getUser();
         } else {
           throw new Error('Cannot create login with this username')
         }
@@ -57,15 +58,16 @@ class App extends Component {
   }
 
   render() {
-    const { loading, user } = this.state;
+    const { loading, user, messages } = this.state;
+
     return (
       <div>
         {
           loading ?
             <Loading /> :
             (
-              user ?
-                <Chatt user={user} /> :
+              (user && messages) ?
+                <Chatt user={user} existingMessages={messages} /> :
                 <Login onLoginSubmit={this.onLoginSubmit} />
             )
         }

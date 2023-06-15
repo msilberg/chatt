@@ -44,8 +44,15 @@ module.exports = {
     open: true,
     historyApiFallback: true,
     proxy: {
-      '/api/v1': 'http://localhost:3000'
-    }
+      '/api/v1': {
+        target: 'http://localhost:3000',
+        secure: false,
+      },
+      '/websocket': {
+        target: 'ws://localhost:3000',
+        ws: true // important
+      },
+    },
   },
   plugins: [
     new CleanWebpackPlugin(),
