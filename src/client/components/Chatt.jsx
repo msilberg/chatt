@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -15,14 +15,21 @@ const Chatt = (props) => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState(existingMessages);
 
+  const chattMessagesFrameRef = useRef(null);
+
+  // handling new message being sent by an another user
   socket(
     ({ eventName, data } = {}) => {
       if (eventName === 'newMessage' && data?.username && data?.message && data.username !== user.username) {
-        console.log('received a new message from another user', data);
         setMessages([...messages, { username: data.username, message: data.message }]);
       }
     }
   );
+
+  useEffect(() => {
+    // scrolling down Chatt messages frame on every new message added
+    chattMessagesFrameRef.current.scrollTop = chattMessagesFrameRef.current.scrollHeight;
+  }, [messages]);
 
   const Item = styled(Paper)(() => ({
     backgroundColor: '#fff',
@@ -79,7 +86,7 @@ const Chatt = (props) => {
     >
       <Paper elevation={12} style={{ backgroundColor: '#ebebeb' }}>
         <h2>{`Welcome to the Chatt room ${user.username.toUpperCase()}!`}</h2>
-        <Stack spacing={2} className='chatt-messages-frame'>
+        <Stack spacing={2} ref={chattMessagesFrameRef} className='chatt-messages-frame'>
           {messages.map(({ username, message }, index) => {
             const isOwn = username === user.username;
             return (
