@@ -6,6 +6,9 @@
 
 [You can see the Live demo of the Chatt App on this video](https://youtu.be/Kw2fvhwgk7A)
 
+### Stating the app
+`make start`
+
 ### Screenshots
 
 <img width="830" alt="Screenshot 2023-06-15 at 10 56 31" src="https://github.com/msilberg/chatt/assets/5354949/ed93daee-1393-4141-9c29-7a9a4e99bb47">

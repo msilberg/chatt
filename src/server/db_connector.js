@@ -1,7 +1,7 @@
 // Mongoose singleton connecto
 const mongoose = require('mongoose');
 
-const mongoURL = `mongodb://${process.env.MONGO_IP_ADDR}:27017/${process.env.APP_NAME}`;
+const mongoURL = 'mongodb://127.0.0.1:27017/chatt';
 
 const connectToDatabase = async () => {
   try {
