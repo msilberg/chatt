@@ -33,7 +33,9 @@ const Chatt = (props) => {
   }, [messages]);
 
   useEffect(() => {
-    setMessages([...messages, { ...newWsMessage }]);
+    if (newWsMessage) {
+      setMessages([...messages, { ...newWsMessage }]);
+    }
   }, [newWsMessage]);
 
   const Item = styled(Paper)(() => ({
