@@ -13,6 +13,7 @@ const Chatt = (props) => {
   const { user, existingMessages, socket } = props;
 
   const [message, setMessage] = useState('');
+  const [newWsMessage, setNewWsMessage] = useState('');
   const [messages, setMessages] = useState(existingMessages);
 
   const chattMessagesFrameRef = useRef(null);
@@ -21,7 +22,7 @@ const Chatt = (props) => {
   socket(
     ({ eventName, data } = {}) => {
       if (eventName === 'newMessage' && data?.username && data?.message && data.username !== user.username) {
-        setMessages([...messages, { username: data.username, message: data.message }]);
+        setNewWsMessage({ ...data })
       }
     }
   );
@@ -30,6 +31,10 @@ const Chatt = (props) => {
     // scrolling down Chatt messages frame on every new message added
     chattMessagesFrameRef.current.scrollTop = chattMessagesFrameRef.current.scrollHeight;
   }, [messages]);
+
+  useEffect(() => {
+    setMessages([...messages, { ...newWsMessage }]);
+  }, [newWsMessage]);
 
   const Item = styled(Paper)(() => ({
     backgroundColor: '#fff',
